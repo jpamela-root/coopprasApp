@@ -1,0 +1,258 @@
+/*
+import { Text, View } from 'react-native';
+
+export default function formulario() {
+    return (
+      <View
+        style={{
+            flex: 1,            
+            justifyContent: 'center',
+            alignItems: 'center'
+        }}
+      >
+       
+      </View>
+    );
+}
+*/
+
+/*
+import React, { useState } from 'react';
+import { View, Text, TextInput, CheckBox, Button } from 'react-native';
+
+interface FieldProps {
+  label: string;
+  id: string;
+  type?: string;
+  value?: string;
+  name?: string;
+  onChange?: (text: string) => void;
+}
+
+const FormField: React.FC<FieldProps> = ({ label, id, type = 'text', value, onChange }) => (
+  <View>
+    <Text>{label}</Text>
+    <TextInput 
+      style={{ borderWidth: 1, padding: 5, marginVertical: 10 }}
+      onChangeText={onChange}
+      value={value}
+      keyboardType={type === 'number' ? 'numeric' : 'default'}
+    />
+  </View>
+);
+
+const CheckboxField: React.FC<FieldProps> = ({ label, id, value, onChange }) => {
+  const [checked, setChecked] = useState(value === 'true');
+
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <CheckBox
+        value={checked}
+        onValueChange={() => {
+          setChecked(!checked);
+          onChange?.(String(!checked));
+        }}
+      />
+      <Text>{label}</Text>
+    </View>
+  );
+};
+
+// Tabela (adaptada para React Native)
+interface TableData {
+  descricao: string;
+  qtde: string;
+  peso: string;
+  valor: string;
+}
+
+interface TableProps {
+  tipo: string;
+  headers: string[];
+  data: TableData[];
+}
+
+const RebanhoTable: React.FC<TableProps> = ({ tipo, headers, data }) => (
+  <View style={{ padding: 10 }}>
+    {headers.map((header) => (
+      <Text key={header} style={{ fontWeight: 'bold', marginVertical: 5 }}>{header}</Text>
+    ))}
+    {data.map((row, rowIndex) => (
+      <View key={row.descricao} style={{ flexDirection: 'row', marginVertical: 5 }}>
+        {headers.map((header) => (
+          <TextInput
+            key={header}
+            style={{ borderWidth: 1, padding: 5, flex: 1, marginRight: 5 }}
+            placeholder={`${header}`}
+          />
+        ))}
+      </View>
+    ))}
+  </View>
+);
+
+const MapaProducaoForm: React.FC = () => {
+  const [descricao, setDescricao] = useState('');
+  const [qtde, setQtde] = useState('');
+  const [peso, setPeso] = useState('');
+  const [valor, setValor] = useState('');
+
+  const data = [{ descricao: '', qtde: '', peso: '', valor: '' }];
+  const headers = ['Descrição', 'Quantidade', 'Peso', 'Valor'];
+
+  return (
+    <View style={{ padding: 20 }}>
+      <FormField label="Descrição" id="descricao" value={descricao} onChange={setDescricao} />
+      <FormField label="Quantidade" id="qtde" type="number" value={qtde} onChange={setQtde} />
+      <FormField label="Peso" id="peso" type="number" value={peso} onChange={setPeso} />
+      <FormField label="Valor" id="valor" type="number" value={valor} onChange={setValor} />
+
+      <RebanhoTable tipo="rebanho" headers={headers} data={data} />
+
+      <Button title="Enviar" onPress={() => console.log('Form enviado!')} />
+    </View>
+  );
+};
+
+export default MapaProducaoForm;
+
+*/
+
+import React, { useState } from 'react';
+
+const RebanhoForm: React.FC = () => {
+    // State para armazenar os dados do formulário
+    const [dadosRebanho, setDadosRebanho] = useState({
+        caprinos: {
+            matriz: { qtde: '', peso: '', valor: '' },
+            reprodutor: { qtde: '', peso: '', valor: '' },
+            cria: { qtde: '', peso: '', valor: '' },
+            aTermo: { qtde: '', peso: '', valor: '' },
+        },
+        ovinose: {
+            matriz: { qtde: '', peso: '', valor: '' },
+            reprodutor: { qtde: '', peso: '', valor: '' },
+            cria: { qtde: '', peso: '', valor: '' },
+            aTermo: { qtde: '', peso: '', valor: '' },
+        },
+        bovinos: {
+            matriz: { qtde: '', peso: '', valor: '' },
+            reprodutor: { qtde: '', peso: '', valor: '' },
+            cria: { qtde: '', peso: '', valor: '' },
+            aTermo: { qtde: '', peso: '', valor: '' },
+        },
+        suinos: {
+            matriz: { qtde: '', peso: '', valor: '' },
+            reprodutor: { qtde: '', peso: '', valor: '' },
+            cria: { qtde: '', peso: '', valor: '' },
+            aTermo: { qtde: '', peso: '', valor: '' },
+        },
+    });
+
+    const handleChange = (category: string, type: string, field: string, value: string) => {
+        setDadosRebanho((prev) => ({
+            ...prev,
+            [category]: {
+                ...prev[category],
+                [type]: {
+                    ...prev[category][type],
+                    [field]: value,
+                },
+            },
+        }));
+    };
+
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        console.log(dadosRebanho);
+        // Aqui você pode adicionar a lógica para enviar os dados
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <h4>REBANHO DE CAPRINOS</h4>
+            <FormTable
+                category="caprinos"
+                data={dadosRebanho.caprinos}
+                onChange={handleChange}
+            />
+
+            <h4>REBANHO DE OVINOS</h4>
+            <FormTable
+                category="ovinose"
+                data={dadosRebanho.ovinose}
+                onChange={handleChange}
+            />
+
+            <h4>REBANHO DE BOVINOS</h4>
+            <FormTable
+                category="bovinos"
+                data={dadosRebanho.bovinos}
+                onChange={handleChange}
+            />
+
+            <h4>REBANHO DE SUÍNOS</h4>
+            <FormTable
+                category="suinos"
+                data={dadosRebanho.suinos}
+                onChange={handleChange}
+            />
+
+            <button type="submit">Enviar</button>
+        </form>
+    );
+};
+
+interface FormTableProps {
+    category: string;
+    data: any;
+    onChange: (category: string, type: string, field: string, value: string) => void;
+}
+
+const FormTable: React.FC<FormTableProps> = ({ category, data, onChange }) => {
+    const types = ['matriz', 'reprodutor', 'cria', 'aTermo'];
+    const descriptions = ['Matriz', 'Reprodutor', 'Cria', 'a Termo'];
+
+    return (
+        <table>
+            <thead>
+                <tr>
+                    <th>DESCRIÇÃO</th>
+                    <th>QTDE</th>
+                    <th>PESO / UNID / KG</th>
+                    <th>VALOR/R$</th>
+                </tr>
+            </thead>
+            <tbody>
+                {types.map((type, index) => (
+                    <tr key={type}>
+                        <td>{descriptions[index]}</td>
+                        <td>
+                            <input
+                                type="text"
+                                value={data[type].qtde}
+                                onChange={(e) => onChange(category, type, 'qtde', e.target.value)}
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                value={data[type].peso}
+                                onChange={(e) => onChange(category, type, 'peso', e.target.value)}
+                            />
+                        </td>
+                        <td>
+                            <input
+                                type="text"
+                                value={data[type].valor}
+                                onChange={(e) => onChange(category, type, 'valor', e.target.value)}
+                            />
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+};
+
+export default RebanhoForm;
