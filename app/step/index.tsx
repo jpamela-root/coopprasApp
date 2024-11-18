@@ -1,4 +1,4 @@
-//import { View, Text, TextInput, ScrollView, StyleSheet, CheckBox, Pressable } from 'react-native';
+
 import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Alert } from 'react-native'
 import { colors } from '../../constants/colors'
 import { Header } from '../../components/header'
@@ -8,6 +8,9 @@ import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import * as MediaLibrary from 'expo-media-library';
 import { PermissionsAndroid, Platform } from 'react-native';
+import { Switch } from 'react-native';
+
+
 
 interface NaturezaOcupacao {
   propriedade: boolean;
@@ -57,6 +60,7 @@ interface FormData {
   ccirIncra: string;
   nirf: string;
   car: boolean;
+  areaReservaLegal: string;
   areaTotalConsolidada: string;
   areaReservaLegalProposta: string;
   areaReconhecidaApp: string;
@@ -69,10 +73,20 @@ interface FormData {
   pastagemCultivada: PastagemCultivada;
   cercado1: Cercado;
   cercado2: Cercado;
+  outrasAreas: string;
   outrasAreasEspecificas: { tamanho: string };
   numeroFamiliasTrabalhando: string;
   numeroFamiliasHabitando: string;
   proprietario: string;
+  localizacao: string;
+  areaPreservacaoPermanente: string;
+  areaConsolidada: string;
+  
+}
+
+// Tipo inicial
+interface FormState {
+  [key: string]: { [key: string]: any };
 }
 
 
@@ -96,7 +110,7 @@ const [formData, setFormData] = useState<FormData>({
     usoColetivo: false,
     Outros: false,
   },
-  
+
   localizacao: '', // Inicializado
   areaReservaLegal: '',
   areaPreservacaoPermanente: '',
@@ -138,6 +152,8 @@ const [formData, setFormData] = useState<FormData>({
   numeroFamiliasHabitando: '',
   numeroFamiliasTrabalhando: '',
   proprietario: '',
+  cidade: '', // 
+  uf: '', // 
 });
 
   
@@ -175,12 +191,35 @@ const handleChange = (field: keyof typeof formData, value: string | boolean) => 
   };
 
 
+  
+// Função corrigida
+
+  
   const capitalize = (str: string) => {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
   
-     
+
+
+  const requestPermissions = async () => {
+    const { status } = await MediaLibrary.requestPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permissão necessária',
+        'É necessário permitir acesso ao armazenamento para gerar e compartilhar o PDF.'
+      );
+      return false;
+    }
+    return true;
+  };
+  
+  
+  const generatePDF = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) return;
+  
+
     const htmlContent = `
     <html>
       <head>
@@ -268,35 +307,27 @@ const handleChange = (field: keyof typeof formData, value: string | boolean) => 
 </html>
 `;
 
-
-const options = {
-      html: htmlContent,
-      base64: false,
-    };
-  
-    try {
-      const pdf = await Print.printToFileAsync(options);
-      await Sharing.shareAsync(pdf.uri);
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível gerar o PDF');
-    }
+const generatePDF = async () => {
+  const options = {
+    html: htmlContent,
+    base64: false,
   };
 
-  
-  const requestPermissions = async () => {
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permissão necessária',
-        'É necessário permitir acesso ao armazenamento para gerar e compartilhar o PDF.'
-      );
-      return false;
-    }
-    return true;
-  };
-  
+  try {
+    const pdf = await Print.printToFileAsync(options);
+    await Sharing.shareAsync(pdf.uri);
+  } catch (error) {
+    Alert.alert('Erro', 'Não foi possível gerar o PDF');
+  }
+};
+
+
+const handleNestedChange = (parentkey: keyof FormData, childKey: string, value: string) => {
+  // ... 
+};
  
- 
+
+
   return (
     <View style={styles.container}>
       <Header step="Voltar" title="DADOS DO COOPERADO E DA PROPRIEDADE RURAL" />
@@ -394,7 +425,8 @@ placeholder="Voltagem" value={formData.fonteEnergia.voltagem} onChangeText={(val
 placeholder="Pastagem nativa" value={formData.pastagemNativa} onChangeText={(value) => handleChange('pastagemNativa', value)} />
 
 <Text style={styles.label}>Pastagem cultivada / Tipo / Área:</Text><TextInput style={styles.input}
-placeholder="Tipo" value={formData.pastagemCultivada.tipo} onChangeText={(value) => handleNestedChange('pastagemCultivada', 'tipo', value)} /><TextInput style={styles.input} placeholder="Área" value={formData.pastagemCultivada.area} onChangeText={(value) => handleNestedChange('pastagemCultivada', 'area', value)} />
+placeholder="Tipo" value={formData.pastagemCultivada.tipo} onChangeText={(value) => handleNestedChange('pastagemCultivada', 'tipo', value)} /><TextInput style={styles.input}
+ placeholder="Área" value={formData.pastagemCultivada.area} onChangeText={(value) => handleNestedChange('pastagemCultivada', 'area', value)} />
 
 <Text style={styles.label}>Cercado 1 / Área / Finalidade:</Text><TextInput style={styles.input}
  placeholder="Área" value={formData.cercado1.area} onChangeText={(value) => handleNestedChange('cercado1', 'area', value)} /><TextInput style={styles.input} 
@@ -425,11 +457,14 @@ placeholder="Contato" value={formData.contato} onChangeText={(value) => handleCh
 
         {/* Botão para gerar o PDF */}
         <Pressable style={styles.button} onPress={generatePDF}>
-          <Text style={styles.buttonText}>Gerar PDF</Text>
-        </Pressable> </ScrollView>
-    </View>
-  );
+        <Text style={styles.buttonText}>Gerar PDF</Text>
+      </Pressable>
+    </ScrollView>
+  </View>
+);
 }
+
+
 
 // Declaração de estilos fora do componente
 const styles = StyleSheet.create({
