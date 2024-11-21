@@ -1,6 +1,6 @@
 import { View, StyleSheet, Pressable, Text , SafeAreaView, Platform, StatusBar } from "react-native";
 import { Feather } from '@expo/vector-icons'
-import { colors } from '../../constants/colors'
+import { colors } from '../../app/constants/colors'
 
 import { router } from 'expo-router'
 
