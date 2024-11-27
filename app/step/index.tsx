@@ -78,6 +78,7 @@ export default function Index() {
         style={styles.logo} // Aplica o estilo personalizado
         source={require('../../assets/images/logo.png')}
       />
+      
 
       <Text style={styles.title}>
       MAPA DE PRODUÇÃO AGROPECUÁRIA

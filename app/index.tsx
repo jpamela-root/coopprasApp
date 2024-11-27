@@ -1,14 +1,24 @@
 
-import { View, Text, StyleSheet, Pressable, ScrollView, TextInput, Alert } from 'react-native'
-import { colors } from '../app/constants/colors'
-import { Header } from '../components/header'
 import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  Pressable, 
+  ScrollView, 
+  TextInput, 
+  Alert,
+  Switch,
+  PermissionsAndroid,
+  Platform,
+} from 'react-native'
+import { colors } from '../app/constants/colors'
 import CheckBox from 'expo-checkbox';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import * as MediaLibrary from 'expo-media-library';
-import { PermissionsAndroid, Platform } from 'react-native';
-import { Switch } from 'react-native';
+import { Header } from '@/components/header';
+
 
 
 
@@ -90,6 +100,7 @@ interface FormState {
 }
 
 
+export default function index() {
 
 const [formData, setFormData] = useState<FormData>({
   nome: '',
@@ -100,7 +111,7 @@ const [formData, setFormData] = useState<FormData>({
   regiaoRota: '',
   distanciaSede: '',
   coordenadas: '',
-  naturezaOcupacao: {
+naturezaOcupacao: {
     propriedade: false,
     posse: false,
     contratoParceria: false,
@@ -110,6 +121,8 @@ const [formData, setFormData] = useState<FormData>({
     usoColetivo: false,
     Outros: false,
   },
+
+ 
 
   localizacao: '', // Inicializado
   areaReservaLegal: '',
@@ -156,7 +169,8 @@ const [formData, setFormData] = useState<FormData>({
   uf: '', // 
 });
 
-  
+
+
 
   const handleChange = (field: keyof FormData, value: string | boolean) => {
     if (field in formData.naturezaOcupacao) {
@@ -173,13 +187,7 @@ const [formData, setFormData] = useState<FormData>({
     }
   };
 
-/*
-const handleChange = (field: keyof typeof formData, value: string | boolean) => {
-  setFormData({ ...formData, [field]: value });
-};
-
-*/
-
+  
   const handleCheckboxChange = (field: keyof typeof formData.naturezaOcupacao) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -191,18 +199,15 @@ const handleChange = (field: keyof typeof formData, value: string | boolean) => 
   };
 
 
-  
-// Função corrigida
-
-  
+   
   const capitalize = (str: string) => {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
+
   
 
-
-  const requestPermissions = async () => {
+const requestPermissions = async () => {
     const { status } = await MediaLibrary.requestPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert(
@@ -213,8 +218,7 @@ const handleChange = (field: keyof typeof formData, value: string | boolean) => 
     }
     return true;
   };
-  
-  
+
   const generatePDF = async () => {
     const hasPermission = await requestPermissions();
     if (!hasPermission) return;
@@ -252,13 +256,11 @@ const handleChange = (field: keyof typeof formData, value: string | boolean) => 
 
         <div class="section">
   <h2>02 Natureza da Ocupação</h2>
-  ${Object.entries(formData.naturezaOcupacao).map(
-    ([key, value]) => `
-      <p><strong>${capitalize(key)}:</strong> ${value ? 'Sim' : 'Não'}</p>`
-  ).join('')}
-</div>
+ 
+ 
 
-        <div class="section">
+
+<div class="section">
   <h2>Áreas do Imóvel</h2>
   <p><strong>Área de Reserva Legal (ha):</strong> ${formData.areaReservaLegal}</p>
   <p><strong>Área de Preservação Permanente (APP) (ha):</strong> ${formData.areaPreservacaoPermanente}</p>
@@ -301,55 +303,41 @@ const handleChange = (field: keyof typeof formData, value: string | boolean) => 
   <p><strong>Dados do Registro / Cidade / UF:</strong> ${formData.dadosRegistro}</p>
   <p><strong>CCIR / INCRA N°:</strong> ${formData.ccirIncra}</p>
   <p><strong>NIRF N°:</strong> ${formData.nirf}</p>
-  <p><strong>Cadastro Ambiental Rural - CAR:</strong> ${formData.car ? 'Sim' : 'Não'}</p>
+  <p><strong>Cadastro Ambiental Rural - CAR:</strong> ${formData.car ? 'Sim' : 'Não'}</ps>
 </div>
 </body>
 </html>
 `;
-
-const generatePDF = async () => {
-  const options = {
-    html: htmlContent,
-    base64: false,
-  };
-
-  try {
-    const pdf = await Print.printToFileAsync(options);
-    await Sharing.shareAsync(pdf.uri);
-  } catch (error) {
-    Alert.alert('Erro', 'Não foi possível gerar o PDF');
-  }
-};
+}
 
 
-const handleNestedChange = (parentkey: keyof FormData, childKey: string, value: string) => {
-  // ... 
-};
+const handleNestedChange = (parentkey: keyof FormData, childKey: string, value: string) => {};
  
+  
+
+return (
+  <View style={styles.container}>
+    <Header step="Voltar" title="DADOS DO COOPERADO E DA PROPRIEDADE RURAL" />
+    <ScrollView contentContainerStyle={styles.content}>
 
 
-  return (
-    <View style={styles.container}>
-      <Header step="Voltar" title="DADOS DO COOPERADO E DA PROPRIEDADE RURAL" />
-      <ScrollView contentContainerStyle={styles.content}>
-        
-        {/* Dados do Cooperado */}
- <Text style={styles.sectionTitle}>01 - DADOS DO COOPERADO</Text>
+      {/* Dados do Cooperado */}
+<Text style={styles.sectionTitle}>01 - DADOS DO COOPERADO</Text>
 <Text style={styles.label}>Nome:</Text><TextInput style={styles.input}
- placeholder="Nome" value={formData.nome} onChangeText={(value) => handleChange('nome', value)} />
+placeholder="Nome" value={formData.nome} onChangeText={(value) => handleChange('nome', value)} />
 
 <Text style={styles.label}>CPF:</Text><TextInput style={styles.input} 
 placeholder="CPF" value={formData.cpf} maxLength={14} onChangeText={(value) => handleChange('cpf', value)} />
 
 <Text style={styles.label}>Contato:</Text><TextInput style={styles.input}
- placeholder="(##) #####-####" value={formData.contato} maxLength={15} onChangeText={(value) => handleChange('contato', value)} />
+placeholder="(##) #####-####" value={formData.contato} maxLength={15} onChangeText={(value) => handleChange('contato', value)} />
 
 <Text style={styles.sectionTitle}>02 - Informações do Imóvel</Text>
 <Text style={styles.label}>Nome do imóvel:</Text><TextInput style={styles.input} 
 placeholder="Nome do Imóvel" value={formData.nomeImovel} onChangeText={(value) => handleChange('nomeImovel', value)} />
 
 <Text style={styles.label}>Área total:</Text><TextInput style={styles.input}
- placeholder="Área total" value={formData.areaTotal} onChangeText={(value) => handleChange('areaTotal', value)} />
+placeholder="Área total" value={formData.areaTotal} onChangeText={(value) => handleChange('areaTotal', value)} />
 
 <Text style={styles.label}>Região/Rota:</Text><TextInput style={styles.input} 
 placeholder="Região/Rota" value={formData.regiaoRota} onChangeText={(value) => handleChange('regiaoRota', value)} />
@@ -358,60 +346,54 @@ placeholder="Região/Rota" value={formData.regiaoRota} onChangeText={(value) => 
 placeholder="Distância / Sede / Km" value={formData.distanciaSede} onChangeText={(value) => handleChange('distanciaSede', value)} />
 
 <Text style={styles.label}>Coordenadas Geográficas:</Text><TextInput style={styles.input}
- placeholder="Coordenadas Geográficas" value={formData.coordenadas} onChangeText={(value) => handleChange('coordenadas', value)} />
+placeholder="Coordenadas Geográficas" value={formData.coordenadas} onChangeText={(value) => handleChange('coordenadas', value)} />
 
 <Text style={styles.label}>Localização (Município/UF):</Text><TextInput style={styles.input} 
 placeholder="Localização" value={formData.localizacao} onChangeText={(value) => handleChange('localizacao', value)} />
 
 
-        {/* Natureza da Ocupação */}
-        <Text style={styles.sectionTitle}>Natureza da Ocupação</Text>
-        <View style={styles.checkboxGroup}> {Object.entries(formData.naturezaOcupacao).map(([key, value]) => (
-            <View key={key} style={styles.checkboxContainer}>
-              <CheckBox
-                value={value} onValueChange={() => handleCheckboxChange(key as keyof NaturezaOcupacao)}
-              />
-              <Text style={styles.checkboxLabel}>{capitalize(key)}</Text>
-            </View>
-          ))}
-        </View>
+      {/* Natureza da Ocupação */}
+      
 
-        {/* Áreas do Imóvel */}
-        <Text style={styles.sectionTitle}>Dados de Registro</Text>
+      {/* Áreas do Imóvel */}
+      <Text style={styles.sectionTitle}>Dados de Registro</Text>
 
-        <Text style={styles.label}>Cidade:</Text>
-        <TextInput style={styles.input} placeholder="Cidade" onChangeText={(value) => handleChange('cidade', value)} />
+      <Text style={styles.label}>Cidade:</Text>
+      <TextInput style={styles.input} placeholder="Cidade" onChangeText={(value) => handleChange('cidade', value)} />
 
-        <Text style={styles.label}>UF:</Text>
-        <TextInput style={styles.input} placeholder="UF" onChangeText={(value) => handleChange('uf', value)} />
+      <Text style={styles.label}>UF:</Text>
+      <TextInput style={styles.input} placeholder="UF" onChangeText={(value) => handleChange('uf', value)} />
 
-        <Text style={styles.label}>CCIR / INCRA Nº:</Text>
-        <TextInput style={styles.input} placeholder="CCIR / INCRA Nº" onChangeText={(value) => handleChange('ccirIncra', value)} />
+      <Text style={styles.label}>CCIR / INCRA Nº:</Text>
+      <TextInput style={styles.input} placeholder="CCIR / INCRA Nº" onChangeText={(value) => handleChange('ccirIncra', value)} />
 
-        <Text style={styles.label}>NIRF Nº:</Text>
-        <TextInput style={styles.input} placeholder="NIRF Nº" onChangeText={(value) => handleChange('nirf', value)} />
+      <Text style={styles.label}>NIRF Nº:</Text>
+      <TextInput style={styles.input} placeholder="NIRF Nº" onChangeText={(value) => handleChange('nirf', value)} />
 
-        <Text style={styles.label}>Cadastro Ambiental Rural - CAR:</Text>
-        <CheckBox value={formData.car} onValueChange={(value) => handleChange('car', value)} />
-        <Text>{formData.car ? 'Sim' : 'Não'}</Text>
+      <Text style={styles.label}>Cadastro Ambiental Rural - CAR:</Text>
+      <CheckBox value={formData.car} onValueChange={(value) => handleChange('car', value)} />
+      <Text>{formData.car ? 'Sim' : 'Não'}</Text>
+
 
 <Text style={styles.label}>Área total consolidada/ha:</Text><TextInput style={styles.input} 
-placeholder="Área total consolidada" value={formData.areaTotalConsolidada} onChangeText={(value) => handleChange('areaTotalConsolidada', value)} />
+placeholder="Área total consolidada" value={formData.areaTotalConsolidada} 
+onChangeText={(value) => handleChange('areaTotalConsolidada', value)} /> 
 
 <Text style={styles.label}>Área de reserva legal proposta:</Text><TextInput style={styles.input} 
 placeholder="Área de reserva legal proposta" value={formData.areaReservaLegalProposta} onChangeText={(value) => handleChange('areaReservaLegalProposta', value)} />
 
 <Text style={styles.label}>Área reconhecida com APP/ha:</Text><TextInput style={styles.input}
- placeholder="Área reconhecida com APP" value={formData.areaReconhecidaApp} onChangeText={(value) => handleChange('areaReconhecidaApp', value)} />
+placeholder="Área reconhecida com APP" value={formData.areaReconhecidaApp} onChangeText={(value) => handleChange('areaReconhecidaApp', value)} />
+
 
 <Text style={styles.label}>Área de litígio/ha:</Text><TextInput style={styles.input} 
 placeholder="Área de litígio" value={formData.areaLitigio} onChangeText={(value) => handleChange('areaLitigio', value)} />
 
 <Text style={styles.label}>Fonte de água potável:</Text><TextInput style={styles.input}
- placeholder="Fonte de água potável" value={formData.fonteAguaPotavel} onChangeText={(value) => handleChange('fonteAguaPotavel', value)} />
+placeholder="Fonte de água potável" value={formData.fonteAguaPotavel} onChangeText={(value) => handleChange('fonteAguaPotavel', value)} />
 
 <Text style={styles.label}>Rio ou Riacho?</Text><Switch value={formData.rioOuRiacho}
- onValueChange={(value) => handleChange('rioOuRiacho', value)} />
+onValueChange={(value) => handleChange('rioOuRiacho', value)} />
 
 <Text style={styles.label}>Existe represa / açude / tipo / área:</Text><TextInput style={styles.input} 
 placeholder="Tipo" value={formData.represa.tipo} onChangeText={(value) => handleNestedChange('represa', 'tipo', value)} /><TextInput style={styles.input} 
@@ -426,15 +408,15 @@ placeholder="Pastagem nativa" value={formData.pastagemNativa} onChangeText={(val
 
 <Text style={styles.label}>Pastagem cultivada / Tipo / Área:</Text><TextInput style={styles.input}
 placeholder="Tipo" value={formData.pastagemCultivada.tipo} onChangeText={(value) => handleNestedChange('pastagemCultivada', 'tipo', value)} /><TextInput style={styles.input}
- placeholder="Área" value={formData.pastagemCultivada.area} onChangeText={(value) => handleNestedChange('pastagemCultivada', 'area', value)} />
+placeholder="Área" value={formData.pastagemCultivada.area} onChangeText={(value) => handleNestedChange('pastagemCultivada', 'area', value)} />
 
 <Text style={styles.label}>Cercado 1 / Área / Finalidade:</Text><TextInput style={styles.input}
- placeholder="Área" value={formData.cercado1.area} onChangeText={(value) => handleNestedChange('cercado1', 'area', value)} /><TextInput style={styles.input} 
- placeholder="Finalidade" value={formData.cercado1.finalidade} onChangeText={(value) => handleNestedChange('cercado1', 'finalidade', value)} />
+placeholder="Área" value={formData.cercado1.area} onChangeText={(value) => handleNestedChange('cercado1', 'area', value)} /><TextInput style={styles.input} 
+placeholder="Finalidade" value={formData.cercado1.finalidade} onChangeText={(value) => handleNestedChange('cercado1', 'finalidade', value)} />
 
 <Text style={styles.label}>Cercado 2 / Área / Finalidade:</Text><TextInput style={styles.input}
- placeholder="Área" value={formData.cercado2.area} onChangeText={(value) => handleNestedChange('cercado2', 'area', value)} /><TextInput style={styles.input}
-  placeholder="Finalidade" value={formData.cercado2.finalidade} onChangeText={(value) => handleNestedChange('cercado2', 'finalidade', value)} />
+placeholder="Área" value={formData.cercado2.area} onChangeText={(value) => handleNestedChange('cercado2', 'area', value)} /><TextInput style={styles.input}
+placeholder="Finalidade" value={formData.cercado2.finalidade} onChangeText={(value) => handleNestedChange('cercado2', 'finalidade', value)} />
 
 <Text style={styles.label}>Outras áreas específicas / Tamanho:</Text><TextInput style={styles.input} 
 placeholder="Tamanho" value={formData.outrasAreasEspecificas.tamanho} onChangeText={(value) => handleNestedChange('outrasAreasEspecificas', 'tamanho', value)} />
@@ -451,20 +433,19 @@ placeholder="Proprietário" value={formData.proprietario} onChangeText={(value) 
 <Text style={styles.label}>CPF:</Text><TextInput style={styles.input} 
 placeholder="CPF" value={formData.cpf} onChangeText={(value) => handleChange('cpf', value)} />
 
+
 <Text style={styles.label}>Contato:</Text><TextInput style={styles.input} 
 placeholder="Contato" value={formData.contato} onChangeText={(value) => handleChange('contato', value)} />
-        
+      
 
-        {/* Botão para gerar o PDF */}
-        <Pressable style={styles.button} onPress={generatePDF}>
-        <Text style={styles.buttonText}>Gerar PDF</Text>
-      </Pressable>
-    </ScrollView>
-  </View>
-);
+      {/* Botão para gerar o PDF */}
+      <Pressable style={styles.button} onPress={generatePDF}>
+      <Text style={styles.buttonText}>Gerar PDF</Text>
+    </Pressable>
+  </ScrollView>
+</View>
+ );
 }
-
-
 
 // Declaração de estilos fora do componente
 const styles = StyleSheet.create({
